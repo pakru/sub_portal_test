@@ -1,0 +1,85 @@
+{
+  "TestName": "Subscriber portal test",
+  "AutoTest" : "True",
+  "TestScript" : "subscr_portal_web_test.py",
+  "DomainName" : "subscriber.port.test",
+  "sipListenPort" : "5076",
+  "SIPuaListenAddr" : "192.168.118.12",
+  "SIPuaListenPort" : "5090",
+  "httpProtocol" : "http",
+  "httpPort" : "81",
+  "Cocon" : [
+    {
+      "Login" : "admin",
+      "Password" : "password",
+      "Host" : "192.168.118.47",
+      "Port" : "8023"
+    }
+  ],
+  "ShareSet" : [
+    {
+      "ShareSetName" : "shareIP",
+      "ShareIP" : "192.168.118.49",
+      "SharePort" : "5092"
+    }
+  ],
+  "Users": [
+    {
+      "UserId": "0",
+      "Number": "1100",
+      "Login": "1100",
+      "Password": "1234",
+      "SipDomain": "pv.ssw3",
+      "Expires": "300",
+      "Port": "10100",
+      "SipGroup": "test.subscr",
+      "QParam": "1"
+    },
+    {
+      "UserId": "1",
+      "Number": "1201",
+      "Login": "1201",
+      "Password": "1234",
+      "SipDomain": "pv.ssw3",
+      "Expires": "300",
+      "Port": "10100",
+      "SipGroup": "test.subscr",
+      "QParam": "1"
+    },
+    {
+      "UserId": "2",
+      "Number": "1202",
+      "Login": "1202",
+      "Password": "1234",
+      "SipDomain": "pv.ssw3",
+      "Expires": "300",
+      "Port": "10100",
+      "SipGroup": "test.subscr",
+      "QParam": "1"
+    },
+    {
+      "UserId": "3",
+      "Number": "1203",
+      "Login": "1203",
+      "Password": "1234",
+      "SipDomain": "pv.ssw3",
+      "Expires": "300",
+      "Port": "10100",
+      "SipGroup": "test.subscr",
+      "QParam": "1"
+    },
+    {
+      "UserId": "4",
+      "Number": "1204",
+      "Login": "1204",
+      "Password": "1234",
+      "SipDomain": "pv.ssw3",
+      "Expires": "300",
+      "Port": "10100",
+      "SipGroup": "test.subscr",
+      "QParam": "1"
+    }
+   ]
+
+
+}
