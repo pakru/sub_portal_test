@@ -1,6 +1,7 @@
 {
   "TestName": "Subscriber portal test",
   "AutoTest" : "True",
+  "ModulePath" : "/home/tester/Документы/testers/Py-ssh-test/tcTester/my_modules",
   "TestScript" : "subscr_portal_web_test.py",
   "DomainName" : "subscriber.port.test",
   "sipListenPort" : "5076",
@@ -12,22 +13,22 @@
     {
       "Login" : "admin",
       "Password" : "password",
-      "Host" : "192.168.118.47",
+      "Host" : "192.168.118.37",
       "Port" : "8023"
     }
   ],
   "ShareSet" : [
     {
       "ShareSetName" : "shareIP",
-      "ShareIP" : "192.168.118.49",
-      "SharePort" : "5092"
+      "ShareIP" : "192.168.118.38",
+      "SharePort" : "5094"
     }
   ],
   "Users": [
     {
       "UserId": "0",
-      "Number": "1100",
-      "Login": "1100",
+      "Number": "1110",
+      "Login": "1110",
       "Password": "1234",
       "SipDomain": "pv.ssw3",
       "Expires": "300",

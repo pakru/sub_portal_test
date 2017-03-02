@@ -49,6 +49,12 @@ def preconfigure():
         print(Fore.RED + 'Smthing happen wrong with shareSet setup...')
         return False
 
+    if ccn.subscriberPortalSetConnection(dom=testingDomain):
+        print(Fore.GREEN + 'Successful subscriber portal properties set')
+    else:
+        print(Fore.RED + 'Smthing happen wrong with subscriber portal properties set...')
+        return False
+
     if ccn.subscribersCreate(dom=testingDomain,
                              sipNumber=sipUsersCfgJson[0]['Number'],
                              sipPass=sipUsersCfgJson[0]['Password'], sipGroup=sipUsersCfgJson[0]['SipGroup'],
@@ -58,12 +64,16 @@ def preconfigure():
         print(Fore.RED + 'Smthing happen wrong with subscribers creation...')
         return False
 
-    sleep(2)
-
     if ccn.subscriberPortalCheckConnection(testingDomain):
         print(Fore.GREEN + 'Connection width MySQL is ok')
     else:
         print(Fore.RED + 'Check subscriber portal MySQL connection failure!')
+        return False
+
+    if ccn.ssEnable(dom=testingDomain,subscrNum=sipUsersCfgJson[0]['Number'],ssNames='*'):
+        print(Fore.GREEN + 'Successful Subscriber services enable')
+    else:
+        print(Fore.RED + 'Smthing happen wrong with subscribers services enable...')
         return False
 
     if ccn.setAliasSubscriberPortalLoginPass(dom=testingDomain,subscrNum=sipUsersCfgJson[0]['Number'], sipGroup=sipUsersCfgJson[0]['SipGroup'],
@@ -80,7 +90,7 @@ def preconfigure():
 class SubscriberPortal(unittest.TestCase):
     def setUp(self):
         #self.driver = webdriver.Chrome()
-        self.driver = webdriver.Remote('http://192.168.118.37:4444/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
+        self.driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
 
         #self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(10)
@@ -108,17 +118,18 @@ class SubscriberPortal(unittest.TestCase):
         driver.find_element_by_id("login_btn").click()  # logining
         self.assertTrue(self.is_element_present(By.XPATH, "//img[@title='Eltex']")) ## check main banner
         #self.assertTrue(self.is_element_present(By.XPATH, "//TD[text()='Петя']")) ## check disp name text
-        #self.assertTrue(self.is_element_present(By.XPATH, "//TD[text()='1001']")) ## check subscriber number
+        self.assertTrue(self.is_element_present(By.XPATH, "//TD[text()='"+ sipUsersCfgJson[0]['Number'] +"']")) ## check subscriber number
         sleep(0.5)
         driver.find_element_by_id("ss_list").click() # switch to ss list
         self.assertTrue(self.is_element_present(By.XPATH, "//*[contains(text(), 'Обслуживание абонента')]")) # assert text
         sleep(0.5)
 
         driver.find_element_by_xpath("//LABEL[@for='ss_list_all']").click() ## switch to all ss
-        sleep(0.5)
+        sleep(2)
+        self.assertTrue(self.is_element_present(By.XPATH, "//label[contains(text(), 'Трехсторонняя конференция')]")) # check if services displayed
         driver.find_element_by_xpath("//LABEL[@for='ss_list_activated']").click() ## switch to activated ss
-        sleep(0.5)
-
+        sleep(2)
+        self.assertFalse(self.is_element_present(By.XPATH, "//label[contains(text(), 'Трехсторонняя конференция')]"))  # check if services disapeared
 
         driver.find_element_by_id("call_history").click() # switch to ss call_history
         self.assertTrue(self.is_element_present(By.XPATH, "//*[contains(text(), 'История вызовов')]")) # assert text
@@ -136,7 +147,7 @@ class SubscriberPortal(unittest.TestCase):
         for i in range(wait_timeout):
             print('.', end='')
             try:
-                print('trying to find element')
+                #print('trying to find element')
                 if self.is_element_present(how, what):
                     # print('found')
                     return True
@@ -144,7 +155,7 @@ class SubscriberPortal(unittest.TestCase):
                 pass
             sleep(1)
         else:
-            print('Didnt found login element')
+            #print('Didnt found login element')
             self.fail("time out")
             return False
 
@@ -152,7 +163,10 @@ class SubscriberPortal(unittest.TestCase):
         try:
             self.driver.find_element(by=how, value=what)
         except NoSuchElementException as e:
-            print('No such element exception!')
+            #print('No such element exception!')
+            return False
+        except Exception as e:
+            print('Exception :' + str(e))
             return False
         return True
 
@@ -169,6 +183,7 @@ class SubscriberPortal(unittest.TestCase):
 
 
 print('Preconfigure')
+
 if not preconfigure():
     print('Failed at preconfigure')
     sys.exit(1)
