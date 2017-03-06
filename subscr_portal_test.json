@@ -1,6 +1,7 @@
 {
   "TestName": "Subscriber portal test",
   "AutoTest" : "True",
+  "Isolate": "False",
   "TestScript" : "subscr_portal_web_test.py",
   "DomainName" : "subscriber.port.test",
   "sipListenPort" : "5076",
