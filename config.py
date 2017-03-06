@@ -1,4 +1,4 @@
-import json, sys, argparse, os
+import json, sys, argparse, os, logging
 '''
 login = 'admin'
 password = 'password'
@@ -14,7 +14,14 @@ dsNode = 'ds1@ecss1'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--custom_config', type=argparse.FileType(), help="Using custom config json file")
+parser.add_argument ('-g', '--global_ccn_lock', type=argparse.FileType('w'), help="Lock file for coconInt")
 args = parser.parse_args()
+
+
+global_ccn_lock = None
+if args.global_ccn_lock:
+    print('Acepted lock file')
+    global_ccn_lock = args.global_ccn_lock
 
 if args.custom_config is not None:
     print("Custom json config is used: " + str(os.path.realpath(args.custom_config.name)))
@@ -35,18 +42,24 @@ except Exception as e:
 finally:
     testConfigFile.close()
 
-if testConfigJson['ModulePath'] not in 'None':
-    sys.path.append(testConfigJson['ModulePath']) # add custom path to external modules if it in json config
+#if testConfigJson['ModulePath'] not in 'None':
+sys.path.append(testConfigJson['SystemVars'][0]['%%MODULE_PATH%%']) # add custom path to external modules if it in json config
+
+logPath = testConfigJson['SystemVars'][0]['%%LOG_PATH%%']
+logFile = logPath+'/'+testConfigJson['TestScript'] + '.log'
+
+logging.basicConfig(filename=logFile, filemode='w', format = u'%(asctime)-8s %(levelname)-8s [%(module)s -> %(funcName)s:%(lineno)d] %(message)-8s', level = logging.INFO)
 
 
-login = testConfigJson['Cocon'][0]['Login']
-password = testConfigJson['Cocon'][0]['Password']
-host = testConfigJson['Cocon'][0]['Host']
-port = int(testConfigJson['Cocon'][0]['Port'])
+login = testConfigJson['SystemVars'][0]['%%DEV_USER%%']
+password = testConfigJson['SystemVars'][0]['%%DEV_PASS%%']
+host = testConfigJson['SystemVars'][0]['%%SERV_IP%%']
+port = int(testConfigJson['SystemVars'][0]['%%CCN_PORT%%'])
 httpProtocol = testConfigJson['httpProtocol']
 httpPort = testConfigJson['httpPort']
 domainName = testConfigJson['DomainName']
 shareSetName = testConfigJson['ShareSet'][0]['ShareSetName']
 shareSetIP = testConfigJson['ShareSet'][0]['ShareIP']
 shareSetPort = testConfigJson['ShareSet'][0]['SharePort']
-webDriverServerIP = '192.168.118.37'
+webDriverServerIP = testConfigJson['SeleniumSettings'][0]['ServerIP']
+usedBrowser = testConfigJson['SeleniumSettings'][0]['Browser']

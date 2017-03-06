@@ -1,4 +1,4 @@
-import config
+import config, logging
 from selenium import webdriver
 #from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -90,8 +90,12 @@ def preconfigure():
 class SubscriberPortal(unittest.TestCase):
     def setUp(self):
         #self.driver = webdriver.Chrome()
-        self.driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
+        if config.usedBrowser is 'Chrome':
+            self.capabilities = DesiredCapabilities.CHROME
+        else:
+            self.capabilities = DesiredCapabilities.CHROME
 
+        self.driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=self.capabilities)
         #self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(10)
         self.base_url = config.httpProtocol + '://' + config.host + ':' + config.httpPort
@@ -144,6 +148,7 @@ class SubscriberPortal(unittest.TestCase):
 
 
     def wait_until_element_present(self, how, what, wait_timeout=10):
+        logging.info('Waiting for ' + str(what) + ' to be appeared on webpage')
         for i in range(wait_timeout):
             print('.', end='')
             try:
@@ -160,13 +165,16 @@ class SubscriberPortal(unittest.TestCase):
             return False
 
     def is_element_present(self, how, what):
+        logging.info('Check if element ' + str(what) + ' presents')
         try:
             self.driver.find_element(by=how, value=what)
         except NoSuchElementException as e:
             #print('No such element exception!')
+            logging.warning('No such element ' + str(what))
             return False
         except Exception as e:
             print('Exception :' + str(e))
+            logging.warning('No such element ' + str(what))
             return False
         return True
 
@@ -185,10 +193,12 @@ class SubscriberPortal(unittest.TestCase):
 print('Preconfigure')
 
 if not preconfigure():
+    logging.error('Failed at preconfiguration')
     print('Failed at preconfigure')
     sys.exit(1)
 
 print('Main test in browser')
+logging.info('Starting main test in browser')
 unittest.main()
 
 sys.exit(0)
