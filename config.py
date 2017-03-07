@@ -20,7 +20,7 @@ args = parser.parse_args()
 
 global_ccn_lock = None
 if args.global_ccn_lock:
-    print('Acepted lock file')
+    print('Accepted lock file')
     global_ccn_lock = args.global_ccn_lock
 
 if args.custom_config is not None:
@@ -59,7 +59,7 @@ httpProtocol = testConfigJson['httpProtocol']
 httpPort = testConfigJson['httpPort']
 domainName = testConfigJson['DomainName']
 shareSetName = testConfigJson['ShareSet'][0]['ShareSetName']
-shareSetIP = testConfigJson['ShareSet'][0]['ShareIP']
+shareSetIP = testConfigJson['SystemVars'][0]['%%EXTER_IP%%']
 shareSetPort = testConfigJson['ShareSet'][0]['SharePort']
 webDriverServerIP = testConfigJson['SeleniumSettings'][0]['ServerIP']
 usedBrowser = testConfigJson['SeleniumSettings'][0]['Browser']

@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3.5
 
-import config, logging
+import config, logging, unittest, time, re, sys, json
 from selenium import webdriver
 #from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -9,9 +9,8 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-import unittest, time, re, sys
 from time import sleep
-import json
+#import json
 import ssh_cocon.ssh_cocon as ccn
 from colorama import Fore
 
