@@ -1,6 +1,6 @@
 {
   "TestName": "Subscriber portal test",
-  "AutoTest" : "True",
+  "AutoTest" : "False",
   "Isolate": "False",
   "TestScript" : "subscr_portal_web_test.py",
   "DomainName" : "subscriber.port.test",
