@@ -45,8 +45,10 @@ finally:
 #if testConfigJson['ModulePath'] not in 'None':
 sys.path.append(testConfigJson['SystemVars'][0]['%%MODULE_PATH%%']) # add custom path to external modules if it in json config
 
-logPath = testConfigJson['SystemVars'][0]['%%LOG_PATH%%']
+logPath = testConfigJson['SystemVars'][0]['%%LOG_PATH%%'] + '/' + testConfigJson['TestScript'][:-3]
 logFile = logPath+'/'+testConfigJson['TestScript'] + '.log'
+if not os.path.exists(logPath):
+    os.makedirs(logPath)
 
 logging.basicConfig(filename=logFile, filemode='w', format = u'%(asctime)-8s %(levelname)-8s [%(module)s -> %(funcName)s:%(lineno)d] %(message)-8s', level = logging.INFO)
 
