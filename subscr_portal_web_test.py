@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3.5
 
-import config, logging, unittest, time, re, sys, json
+import config, logging, time, sys
 from selenium import webdriver
 #from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -17,6 +17,48 @@ from colorama import Fore
 testingDomain = config.domainName
 sipUsersCfgJson = config.testConfigJson['Users']
 sipShareCfgJson = config.testConfigJson['ShareSet'][0]
+
+driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
+
+def initDriver():
+    #global driver
+    logging.info('Init remote driver')
+    #driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
+    driver.implicitly_wait(10)
+    driver.set_window_size(1200, 800)
+
+def wait_until_element_present(how, what, wait_timeout=10):
+    logging.info('Waiting for element '+ str(what))
+    for i in range(wait_timeout):
+        print('.', end='')
+        try:
+        #print('trying to find element')
+            if is_element_present(how, what):
+                # print('found')
+                logging.info('Element ' + str(what) + ' found')
+                return True
+        except Exception as e:
+            pass
+            sleep(1)
+    else:
+        #print('Didnt found login element')
+        print("time out")
+        logging.error('Expected element ' + str(what))
+        return False
+
+def is_element_present(how, what):
+    logging.info('Check if element '+ str(what) +' present')
+    try:
+        driver.find_element(by=how, value=what)
+    except NoSuchElementException as e:
+        logging.info('Didnt found element')
+       # print('No such element exception!')
+        return False
+    except Exception as e:
+       print('Exception :' + str(e))
+       logging.warning('Unexpected exception ' + str(e) + ' during searching of ' + str(what))
+       return False
+    return True
 
 def preconfigure():
     if ccn.domainDeclare(testingDomain, removeIfExists=True):
@@ -86,8 +128,61 @@ def preconfigure():
 
     return True
 
+def test_subscr_portal_login():
+    driver.set_window_size(1200, 800)
+    base_url = config.httpProtocol + '://' + config.host + ':' + config.httpPort
+    driver.get(base_url)
 
+    wait_until_element_present(By.ID, 'login')
 
+    driver.find_element_by_id("login").clear()
+    driver.find_element_by_id("login").send_keys(sipUsersCfgJson[0]['Number'])
+    driver.find_element_by_id("password").clear()
+    driver.find_element_by_id("password").send_keys(sipUsersCfgJson[0]['Password'])
+    # chooos in combobox
+    Select(driver.find_element_by_id("domain")).select_by_visible_text(testingDomain)  # choose domain in combobox
+    # sleep(2)
+    # driver.find_element_by_xpath("//select[@id='domain']/option").click()
+    sleep(0.5)
+    driver.find_element_by_id("login_btn").click()  # logining
+    if not assertTrue(is_element_present(By.XPATH, "//img[@title='Eltex']")): ## check main banner
+        return False
+    # self.assertTrue(self.is_element_present(By.XPATH, "//TD[text()='Петя']")) ## check disp name text
+    if not assertTrue(is_element_present(By.XPATH, "//TD[text()='" + sipUsersCfgJson[0][
+        'Number'] + "']")):  ## check subscriber number
+        return False
+    sleep(0.5)
+    driver.find_element_by_id("ss_list").click()  # switch to ss list
+    if not assertTrue(is_element_present(By.XPATH, "//*[contains(text(), 'Обслуживание абонента')]")): # assert text
+        return False
+    sleep(0.5)
+
+    driver.find_element_by_xpath("//LABEL[@for='ss_list_all']").click()  ## switch to all ss
+    sleep(2)
+    if not assertTrue(is_element_present(By.XPATH,
+                                            "//label[contains(text(), 'Трехсторонняя конференция')]")):  # check if services displayed
+        return False
+    driver.find_element_by_xpath("//LABEL[@for='ss_list_activated']").click()  ## switch to activated ss
+    sleep(2)
+    if not assertFalse(is_element_present(By.XPATH,
+                                             "//label[contains(text(), 'Трехсторонняя конференция')]")):  # check if services disapeared
+        return False
+
+    driver.find_element_by_id("call_history").click()  # switch to ss call_history
+    if not assertTrue(is_element_present(By.XPATH, "//*[contains(text(), 'История вызовов')]")):  # assert text
+        return False
+    sleep(0.5)
+
+    driver.find_element_by_id("reset").click()  # switch to ss call_history
+    if not assertTrue(is_element_present(By.XPATH, "//*[contains(text(), 'Информация об абоненте')]")):  # assert text
+        return False
+    sleep(0.5)
+
+    driver.find_element_by_xpath("//*[contains(text(), 'Выход')]").click()  ## logout
+    if not assertTrue(is_element_present(By.ID, 'login')):
+        return False
+
+'''
 class SubscriberPortal(unittest.TestCase):
     def setUp(self):
         #self.driver = webdriver.Chrome()
@@ -189,17 +284,39 @@ class SubscriberPortal(unittest.TestCase):
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
+'''
 
+def assertTrue(what,msg=''):
+    logging.info('Assertion if true :' + str(what))
+    if what is True:
+        return True
+    else:
+        return False
+
+def assertFalse(what, msg=''):
+    logging.info('Assertion if false :' + str(what))
+    if what is False:
+        return True
+    else:
+        return False
+
+def closeDriver():
+    driver.quit()
 
 print('Preconfigure')
-
+'''
 if not preconfigure():
     logging.error('Failed at preconfiguration')
     print('Failed at preconfigure')
     sys.exit(1)
+'''
 
 print('Main test in browser')
 logging.info('Starting main test in browser')
-unittest.main()
+initDriver()
+test_subscr_portal_login()
+closeDriver()
+
+#unittest.main()
 
 sys.exit(0)
