@@ -2,7 +2,7 @@
 
 import config, logging, time, sys
 from selenium import webdriver
-#from selenium.webdriver.remote.webdriver import WebDriver
+# from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
@@ -10,7 +10,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from time import sleep
-#import json
+# import json
 import ssh_cocon.ssh_cocon as ccn
 from colorama import Fore
 
@@ -18,21 +18,26 @@ testingDomain = config.domainName
 sipUsersCfgJson = config.testConfigJson['Users']
 sipShareCfgJson = config.testConfigJson['ShareSet'][0]
 
-driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
+testResultsList = []
+
+driver = webdriver.Remote('http://' + config.webDriverServerIP + ':4444/wd/hub',
+                          desired_capabilities=DesiredCapabilities.CHROME)
+
 
 def initDriver():
-    #global driver
+    # global driver
     logging.info('Init remote driver')
-    #driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
+    # driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=DesiredCapabilities.CHROME)
     driver.implicitly_wait(10)
     driver.set_window_size(1200, 800)
 
+
 def wait_until_element_present(how, what, wait_timeout=10):
-    logging.info('Waiting for element '+ str(what))
+    logging.info('Waiting for element ' + str(what))
     for i in range(wait_timeout):
         print('.', end='')
         try:
-        #print('trying to find element')
+            # print('trying to find element')
             if is_element_present(how, what):
                 # print('found')
                 logging.info('Element ' + str(what) + ' found')
@@ -41,24 +46,26 @@ def wait_until_element_present(how, what, wait_timeout=10):
             pass
             sleep(1)
     else:
-        #print('Didnt found login element')
+        # print('Didnt found login element')
         print("time out")
         logging.error('Expected element ' + str(what))
         return False
 
+
 def is_element_present(how, what):
-    logging.info('Check if element '+ str(what) +' present')
+    logging.info('Check if element ' + str(what) + ' present')
     try:
         driver.find_element(by=how, value=what)
     except NoSuchElementException as e:
         logging.info('Didnt found element')
-       # print('No such element exception!')
+        # print('No such element exception!')
         return False
     except Exception as e:
-       print('Exception :' + str(e))
-       logging.warning('Unexpected exception ' + str(e) + ' during searching of ' + str(what))
-       return False
+        print('Exception :' + str(e))
+        logging.warning('Unexpected exception ' + str(e) + ' during searching of ' + str(what))
+        return False
     return True
+
 
 def preconfigure():
     if ccn.domainDeclare(testingDomain, removeIfExists=True):
@@ -80,13 +87,13 @@ def preconfigure():
     if not ccn.ssAddAccessAll(dom=testingDomain):
         return False
 
-    if ccn.sipShareSetDeclare(sharesetName=config.shareSetName,sipIP=config.shareSetIP,sipPort=config.shareSetPort):
+    if ccn.sipShareSetDeclare(sharesetName=config.shareSetName, sipIP=config.shareSetIP, sipPort=config.shareSetPort):
         print(Fore.GREEN + 'Successful shareSet creation')
     else:
         print(Fore.RED + 'Smthing happen wrong with shareSet creation...')
         return False
 
-    if ccn.sipTransportShareSetup(dom=testingDomain,sharesetName=config.shareSetName):
+    if ccn.sipTransportShareSetup(dom=testingDomain, sharesetName=config.shareSetName):
         print(Fore.GREEN + 'Successful shareSet setup')
     else:
         print(Fore.RED + 'Smthing happen wrong with shareSet setup...')
@@ -113,13 +120,14 @@ def preconfigure():
         print(Fore.RED + 'Check subscriber portal MySQL connection failure!')
         return False
 
-    if ccn.ssEnable(dom=testingDomain,subscrNum=sipUsersCfgJson[0]['Number'],ssNames='*'):
+    if ccn.ssEnable(dom=testingDomain, subscrNum=sipUsersCfgJson[0]['Number'], ssNames='*'):
         print(Fore.GREEN + 'Successful Subscriber services enable')
     else:
         print(Fore.RED + 'Smthing happen wrong with subscribers services enable...')
         return False
 
-    if ccn.setAliasSubscriberPortalLoginPass(dom=testingDomain,subscrNum=sipUsersCfgJson[0]['Number'], sipGroup=sipUsersCfgJson[0]['SipGroup'],
+    if ccn.setAliasSubscriberPortalLoginPass(dom=testingDomain, subscrNum=sipUsersCfgJson[0]['Number'],
+                                             sipGroup=sipUsersCfgJson[0]['SipGroup'],
                                              login=sipUsersCfgJson[0]['Number'], passwd=sipUsersCfgJson[0]['Password']):
         print(Fore.GREEN + 'Successful Subscriber portal login/pass set')
     else:
@@ -127,6 +135,7 @@ def preconfigure():
         return False
 
     return True
+
 
 def test_subscr_portal_login():
     driver.set_window_size(1200, 800)
@@ -145,7 +154,7 @@ def test_subscr_portal_login():
     # driver.find_element_by_xpath("//select[@id='domain']/option").click()
     sleep(0.5)
     driver.find_element_by_id("login_btn").click()  # logining
-    if not assertTrue(is_element_present(By.XPATH, "//img[@title='Eltex']")): ## check main banner
+    if not assertTrue(is_element_present(By.XPATH, "//img[@title='Eltex']")):  ## check main banner
         return False
     # self.assertTrue(self.is_element_present(By.XPATH, "//TD[text()='Петя']")) ## check disp name text
     if not assertTrue(is_element_present(By.XPATH, "//TD[text()='" + sipUsersCfgJson[0][
@@ -153,19 +162,19 @@ def test_subscr_portal_login():
         return False
     sleep(0.5)
     driver.find_element_by_id("ss_list").click()  # switch to ss list
-    if not assertTrue(is_element_present(By.XPATH, "//*[contains(text(), 'Обслуживание абонента')]")): # assert text
+    if not assertTrue(is_element_present(By.XPATH, "//*[contains(text(), 'Обслуживание абонента')]")):  # assert text
         return False
     sleep(0.5)
 
     driver.find_element_by_xpath("//LABEL[@for='ss_list_all']").click()  ## switch to all ss
     sleep(2)
     if not assertTrue(is_element_present(By.XPATH,
-                                            "//label[contains(text(), 'Трехсторонняя конференция')]")):  # check if services displayed
+                                         "//label[contains(text(), 'Трехсторонняя конференция')]")):  # check if services displayed
         return False
     driver.find_element_by_xpath("//LABEL[@for='ss_list_activated']").click()  ## switch to activated ss
     sleep(2)
     if not assertFalse(is_element_present(By.XPATH,
-                                             "//label[contains(text(), 'Трехсторонняя конференция')]")):  # check if services disapeared
+                                          "//label[contains(text(), 'Трехсторонняя конференция')]")):  # check if services disapeared
         return False
 
     driver.find_element_by_id("call_history").click()  # switch to ss call_history
@@ -181,6 +190,8 @@ def test_subscr_portal_login():
     driver.find_element_by_xpath("//*[contains(text(), 'Выход')]").click()  ## logout
     if not assertTrue(is_element_present(By.ID, 'login')):
         return False
+
+    return True
 
 '''
 class SubscriberPortal(unittest.TestCase):
@@ -286,12 +297,14 @@ class SubscriberPortal(unittest.TestCase):
         self.assertEqual([], self.verificationErrors)
 '''
 
-def assertTrue(what,msg=''):
+
+def assertTrue(what, msg=''):
     logging.info('Assertion if true :' + str(what))
     if what is True:
         return True
     else:
         return False
+
 
 def assertFalse(what, msg=''):
     logging.info('Assertion if false :' + str(what))
@@ -300,8 +313,26 @@ def assertFalse(what, msg=''):
     else:
         return False
 
+
 def closeDriver():
     driver.quit()
+
+
+def iterTest(testMethod, testName, terminateOnFailure=False):
+    if testMethod:
+        res = True
+        resultStr = testName + ' - OK'
+        logging.info(resultStr)
+    else:
+        res = False
+        resultStr = testName + ' - FAILED'
+        logging.error(resultStr)
+        if terminateOnFailure:
+            sys.exit(1)
+    testResultsList.append(resultStr)
+    print(resultStr)
+    return res
+
 
 print('Preconfigure')
 '''
@@ -310,13 +341,27 @@ if not preconfigure():
     print('Failed at preconfigure')
     sys.exit(1)
 '''
+success = True
 
+iterTest(preconfigure(),'Preconfiguration',True)
 print('Main test in browser')
 logging.info('Starting main test in browser')
 initDriver()
-test_subscr_portal_login()
+success = success & iterTest(test_subscr_portal_login(), 'Subscriber portal login')
 closeDriver()
 
-#unittest.main()
+print('Total Results of Teleconference tests:')
+for reportStr in testResultsList:
+    print(reportStr)
+    logging.info(reportStr)
 
-sys.exit(0)
+if not success:
+    print(Fore.RED + 'Some tests failed!')
+    logging.error('Some tests failed!')
+    sys.exit(1)
+else:
+    print(Fore.GREEN + 'It seems to be all FINE...')
+    logging.info('All test OK!')
+    print('We did it!!')
+    sys.exit(0)
+
