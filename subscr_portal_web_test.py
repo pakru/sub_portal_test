@@ -120,6 +120,12 @@ def preconfigure():
         print(Fore.RED + 'Check subscriber portal MySQL connection failure!')
         return False
 
+    if ccn.subscriberPortalSync(testingDomain,password='1234'):
+        print(Fore.GREEN + 'Successful subscriber portal sync')
+    else:
+        print(Fore.RED + 'Successful subscriber portal sync failed')
+        #return False
+
     if ccn.ssEnable(dom=testingDomain, subscrNum=sipUsersCfgJson[0]['Number'], ssNames='*'):
         print(Fore.GREEN + 'Successful Subscriber services enable')
     else:
