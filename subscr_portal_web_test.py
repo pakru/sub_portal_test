@@ -1,6 +1,6 @@
 #!/usr/local/bin/python3.5
 
-import config, logging, time, sys
+import config, logging, time, sys, atexit
 from selenium import webdriver
 # from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -22,7 +22,6 @@ testResultsList = []
 
 driver = webdriver.Remote('http://' + config.webDriverServerIP + ':4444/wd/hub',
                           desired_capabilities=DesiredCapabilities.CHROME)
-
 
 def initDriver():
     # global driver
@@ -321,7 +320,11 @@ def assertFalse(what, msg=''):
 
 
 def closeDriver():
-    driver.quit()
+	try:
+		driver.quit()
+	except Exception as e:
+		pass
+
 
 
 def iterTest(testMethod, testName, terminateOnFailure=False):
@@ -339,6 +342,7 @@ def iterTest(testMethod, testName, terminateOnFailure=False):
     print(resultStr)
     return res
 
+atexit.register(closeDriver)
 
 print('Preconfigure')
 '''
@@ -354,7 +358,7 @@ print('Main test in browser')
 logging.info('Starting main test in browser')
 initDriver()
 success = success & iterTest(test_subscr_portal_login(), 'Subscriber portal login')
-closeDriver()
+#closeDriver()
 
 print('Total Results of Teleconference tests:')
 for reportStr in testResultsList:
