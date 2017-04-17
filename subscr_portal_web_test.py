@@ -198,110 +198,6 @@ def test_subscr_portal_login():
 
     return True
 
-'''
-class SubscriberPortal(unittest.TestCase):
-    def setUp(self):
-        #self.driver = webdriver.Chrome()
-        if config.usedBrowser is 'Chrome':
-            self.capabilities = DesiredCapabilities.CHROME
-        else:
-            self.capabilities = DesiredCapabilities.CHROME
-
-        self.driver = webdriver.Remote('http://'+ config.webDriverServerIP +':4444/wd/hub',desired_capabilities=self.capabilities)
-        #self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(10)
-        self.base_url = config.httpProtocol + '://' + config.host + ':' + config.httpPort
-        self.verificationErrors = []
-    # self.accept_next_alert = True
-
-    def test_subscr_portal_login(self):
-        driver = self.driver
-        driver.set_window_size(1200,800)
-        driver.get(self.base_url)
-
-
-        self.wait_until_element_present(By.ID, 'login')
-
-        driver.find_element_by_id("login").clear()
-        driver.find_element_by_id("login").send_keys(sipUsersCfgJson[0]['Number'])
-        driver.find_element_by_id("password").clear()
-        driver.find_element_by_id("password").send_keys(sipUsersCfgJson[0]['Password'])
-        #chooos in combobox
-        Select(driver.find_element_by_id("domain")).select_by_visible_text(testingDomain) # choose domain in combobox
-        #sleep(2)
-        #driver.find_element_by_xpath("//select[@id='domain']/option").click()
-        sleep(0.5)
-        driver.find_element_by_id("login_btn").click()  # logining
-        self.assertTrue(self.is_element_present(By.XPATH, "//img[@title='Eltex']")) ## check main banner
-        #self.assertTrue(self.is_element_present(By.XPATH, "//TD[text()='Петя']")) ## check disp name text
-        self.assertTrue(self.is_element_present(By.XPATH, "//TD[text()='"+ sipUsersCfgJson[0]['Number'] +"']")) ## check subscriber number
-        sleep(0.5)
-        driver.find_element_by_id("ss_list").click() # switch to ss list
-        self.assertTrue(self.is_element_present(By.XPATH, "//*[contains(text(), 'Обслуживание абонента')]")) # assert text
-        sleep(0.5)
-
-        driver.find_element_by_xpath("//LABEL[@for='ss_list_all']").click() ## switch to all ss
-        sleep(2)
-        self.assertTrue(self.is_element_present(By.XPATH, "//label[contains(text(), 'Трехсторонняя конференция')]")) # check if services displayed
-        driver.find_element_by_xpath("//LABEL[@for='ss_list_activated']").click() ## switch to activated ss
-        sleep(2)
-        self.assertFalse(self.is_element_present(By.XPATH, "//label[contains(text(), 'Трехсторонняя конференция')]"))  # check if services disapeared
-
-        driver.find_element_by_id("call_history").click() # switch to ss call_history
-        self.assertTrue(self.is_element_present(By.XPATH, "//*[contains(text(), 'История вызовов')]")) # assert text
-        sleep(0.5)
-
-        driver.find_element_by_id("reset").click() # switch to ss call_history
-        self.assertTrue(self.is_element_present(By.XPATH, "//*[contains(text(), 'Информация об абоненте')]")) # assert text
-        sleep(0.5)
-
-        driver.find_element_by_xpath("//*[contains(text(), 'Выход')]").click() ## logout
-        self.assertTrue(self.is_element_present(By.ID, 'login'))
-
-
-    def wait_until_element_present(self, how, what, wait_timeout=10):
-        logging.info('Waiting for ' + str(what) + ' to be appeared on webpage')
-        for i in range(wait_timeout):
-            print('.', end='')
-            try:
-                #print('trying to find element')
-                if self.is_element_present(how, what):
-                    # print('found')
-                    return True
-            except Exception as e:
-                pass
-            sleep(1)
-        else:
-            #print('Didnt found login element')
-            self.fail("time out")
-            return False
-
-    def is_element_present(self, how, what):
-        logging.info('Check if element ' + str(what) + ' presents')
-        try:
-            self.driver.find_element(by=how, value=what)
-        except NoSuchElementException as e:
-            #print('No such element exception!')
-            logging.warning('No such element ' + str(what))
-            return False
-        except Exception as e:
-            print('Exception :' + str(e))
-            logging.warning('No such element ' + str(what))
-            return False
-        return True
-
-    def is_alert_present(self):
-        try:
-            self.driver.switch_to_alert()
-        except NoAlertPresentException as e:
-            return False
-        return True
-
-    def tearDown(self):
-        self.driver.quit()
-        self.assertEqual([], self.verificationErrors)
-'''
-
 
 def assertTrue(what, msg=''):
     logging.info('Assertion if true :' + str(what))
@@ -344,15 +240,9 @@ def iterTest(testMethod, testName, terminateOnFailure=False):
 
 atexit.register(closeDriver)
 
-print('Preconfigure')
-'''
-if not preconfigure():
-    logging.error('Failed at preconfiguration')
-    print('Failed at preconfigure')
-    sys.exit(1)
-'''
 success = True
 
+print('Preconfigure')
 iterTest(preconfigure(),'Preconfiguration',True)
 print('Main test in browser')
 logging.info('Starting main test in browser')
