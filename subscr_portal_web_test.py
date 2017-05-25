@@ -144,6 +144,8 @@ def preconfigure():
     else:
         print(Fore.RED + 'Successful subscriber portal sync failed')
 
+    time.sleep(10)
+
     return True
 
 
@@ -221,10 +223,10 @@ def assertFalse(what, msg=''):
 
 
 def closeDriver():
-	try:
-		driver.quit()
-	except Exception as e:
-		pass
+    try:
+        driver.quit()
+    except Exception as e:
+        pass
 
 
 
