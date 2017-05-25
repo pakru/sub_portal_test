@@ -98,7 +98,7 @@ def preconfigure():
         print(Fore.RED + 'Smthing happen wrong with shareSet setup...')
         return False
 
-    if ccn.subscriberPortalSetConnection(dom=testingDomain):
+    if ccn.subscriberPortalSetConnection(dom=testingDomain, host='cocon.mysql.ecss'):
         print(Fore.GREEN + 'Successful subscriber portal properties set')
     else:
         print(Fore.RED + 'Smthing happen wrong with subscriber portal properties set...')
