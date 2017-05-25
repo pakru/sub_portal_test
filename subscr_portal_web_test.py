@@ -139,6 +139,11 @@ def preconfigure():
         print(Fore.RED + 'Failed to set Subscriber portal login/pass...')
         return False
 
+    if ccn.subscriberPortalSync(testingDomain,password='1234'):
+        print(Fore.GREEN + 'Successful subscriber portal sync')
+    else:
+        print(Fore.RED + 'Successful subscriber portal sync failed')
+
     return True
 
 
